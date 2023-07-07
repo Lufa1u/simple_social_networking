@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  postgres_db:
+    image: postgres:15
+    container_name: postgres
+    volumes:
+      - postgres_db:/var/lib/postgresql/data
+    env_file:
+      - .env
+
+  simple_social_networking:
+    build:
+      dockerfile: ./dockerfile
+      context: .
+    container_name: simple_social_networking
+    image: simple_social_networking:latest
+    depends_on:
+      - postgres_db
+    env_file:
+      - .env
+    command: >
+      bash -c "alembic upgrade head | uvicorn main:app --reload --host 0.0.0.0 --port 8000"
+    ports:
+      - 8000:8000
+
+volumes:
+  postgres_db:
+
+
